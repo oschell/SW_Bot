@@ -1,0 +1,6 @@
+C:\Users\Oleg\Documents\Visual Studio 2015\Projects\SW_Level_Bot\SW_Level_Bot\bin\Debug\SW_Level_Bot.exe.config
+C:\Users\Oleg\Documents\Visual Studio 2015\Projects\SW_Level_Bot\SW_Level_Bot\bin\Debug\SW_Level_Bot.exe
+C:\Users\Oleg\Documents\Visual Studio 2015\Projects\SW_Level_Bot\SW_Level_Bot\bin\Debug\SW_Level_Bot.pdb
+C:\Users\Oleg\Documents\Visual Studio 2015\Projects\SW_Level_Bot\SW_Level_Bot\obj\Debug\SW_Level_Bot.exe
+C:\Users\Oleg\Documents\Visual Studio 2015\Projects\SW_Level_Bot\SW_Level_Bot\obj\Debug\SW_Level_Bot.pdb
+C:\Users\Oleg\Documents\Visual Studio 2015\Projects\SW_Level_Bot\SW_Level_Bot\obj\Debug\SW_Level_Bot.csprojResolveAssemblyReference.cache

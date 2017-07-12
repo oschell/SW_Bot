@@ -1,0 +1,6 @@
+C:\Users\Oleg\documents\visual studio 2015\Projects\SW_Level_Bot\SW_Level_Bot\bin\Release\SW_Level_Bot.exe.config
+C:\Users\Oleg\documents\visual studio 2015\Projects\SW_Level_Bot\SW_Level_Bot\bin\Release\SW_Level_Bot.exe
+C:\Users\Oleg\documents\visual studio 2015\Projects\SW_Level_Bot\SW_Level_Bot\bin\Release\SW_Level_Bot.pdb
+C:\Users\Oleg\documents\visual studio 2015\Projects\SW_Level_Bot\SW_Level_Bot\obj\Release\SW_Level_Bot.exe
+C:\Users\Oleg\documents\visual studio 2015\Projects\SW_Level_Bot\SW_Level_Bot\obj\Release\SW_Level_Bot.pdb
+C:\Users\Oleg\documents\visual studio 2015\Projects\SW_Level_Bot\SW_Level_Bot\obj\Release\SW_Level_Bot.csprojResolveAssemblyReference.cache
