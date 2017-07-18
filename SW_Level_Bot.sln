@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SW_Level_Bot", "SW_Level_Bot\SW_Level_Bot.csproj", "{9BB991FE-0C79-4203-B95B-0C1EB6433F8C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Win32Library", "Win32Library\Win32Library.csproj", "{347242B9-0924-4A73-B099-0E9185BF6684}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{9BB991FE-0C79-4203-B95B-0C1EB6433F8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9BB991FE-0C79-4203-B95B-0C1EB6433F8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9BB991FE-0C79-4203-B95B-0C1EB6433F8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{347242B9-0924-4A73-B099-0E9185BF6684}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{347242B9-0924-4A73-B099-0E9185BF6684}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{347242B9-0924-4A73-B099-0E9185BF6684}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{347242B9-0924-4A73-B099-0E9185BF6684}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -4,136 +4,232 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using System.Diagnostics;
+using Win32Library;
+
+using static SW_Level_Bot.Randomizer;
+using Screen = Win32Library.Screen;
 
 namespace SW_Level_Bot
 {
     class Program
     {
+        static readonly string ROOTPATH = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "TodaysRunes\\Rune";
+        static readonly string SUBPATH = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "TodaysRunes\\Sold5Stars\\Rune";
 
-        const string ROOTPATH = "C:\\Users\\Oleg\\Desktop\\TodaysRunes\\Rune";
-        const string SUBPATH = "C:\\Users\\Oleg\\Desktop\\TodaysRunes\\Sold5Stars\\Rune";
-
-        //##########################################################################################################
-        //###################################        GLOBAL VARIABLES         ######################################
-        //##########################################################################################################
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
-        public static extern void mouse_event(uint dwFlags, uint dx, uint dy, uint cButtons, UIntPtr dwExtraInfo);
-        private const uint MOUSEEVENTF_LEFTDOWN = 0x02;
-        private const uint MOUSEEVENTF_LEFTUP = 0x04;
-        private const uint MOUSEEVENTF_RIGHTDOWN = 0x08;
-        private const uint MOUSEEVENTF_RIGHTUP = 0x10;
-
-        [DllImport("gdi32.dll", CharSet = CharSet.Auto, SetLastError = true, ExactSpelling = true)]
-        public static extern int BitBlt(IntPtr hDC, int x, int y, int nWidth, int nHeight, IntPtr hSrcDC, int xSrc, int ySrc, int dwRop);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        internal static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
-
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-
-        static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
-        [StructLayout(LayoutKind.Sequential)]
-        public struct RECT
+        static bool CheckEnergyEmpty(bool refreshEnergy, IButtonPositionsAndColors posColorManager)
         {
-            public int Left;
-            public int Top;
-            public int Right;
-            public int Bottom;
-        }
+            bool energyEmpty = refreshEnergy && posColorManager.CheckEnergyEmpty1Col.Matches(Screen.GetPixel(posColorManager.CheckEnergyEmpty1Pos))
+                && posColorManager.CheckEnergyEmpty2Col.Matches(Screen.GetPixel(posColorManager.CheckEnergyEmpty2Pos));
 
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-        //##########################################################################################################
-        //##################################        MOUSE FUNCTIONS         ########################################
-        //##########################################################################################################
-
-        static void sendMouseRightclick(Point p)
-        {
-            System.Windows.Forms.Cursor.Position = p;
-            mouse_event(MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP, (uint)p.X, (uint)p.Y, 0, (UIntPtr)0);
-        }
-
-        static void sendMouseLeftclick(Point p)
-        {
-            System.Windows.Forms.Cursor.Position = p;
-            mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, (uint)p.X, (uint)p.Y, 0, (UIntPtr)0);
-        }
-
-        static void sendMouseDoubleClick(Point p)
-        {
-            System.Windows.Forms.Cursor.Position = p;
-            mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, (uint)p.X, (uint)p.Y, 0, (UIntPtr)0);
-
-            Thread.Sleep(Randomize(250, 750));
-
-            mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, (uint)p.X, (uint)p.Y, 0, (UIntPtr)0);
-        }
-
-        static void sendMouseRightDoubleClick(Point p)
-        {
-            System.Windows.Forms.Cursor.Position = p;
-            mouse_event(MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP, (uint)p.X, (uint)p.Y, 0, (UIntPtr)0);
-
-            Thread.Sleep(150);
-
-            mouse_event(MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP, (uint)p.X, (uint)p.Y, 0, (UIntPtr)0);
-        }
-
-        static void sendMouseDown()
-        {
-            mouse_event(MOUSEEVENTF_LEFTDOWN, 50, 50, 0, (UIntPtr)0);
-        }
-
-        static void sendMouseUp()
-        {
-            mouse_event(MOUSEEVENTF_LEFTUP, 50, 50, 0, (UIntPtr)0);
-        }
-
-
-        //##########################################################################################################
-        //####################################         FUNCTIONS         ###########################################
-        //##########################################################################################################
-
-        static Color GetPixel(Point position)
-        {
-            using (var bitmap = new Bitmap(1, 1))
+            if (energyEmpty)
             {
-                using (var graphics = Graphics.FromImage(bitmap))
+                RefillEnergy(posColorManager);
+                Thread.Sleep(Randomize(300, 2000));
+                Mouse.LeftClick(posColorManager.ReplayButtonPos);
+                Thread.Sleep(Randomize(300, 2500));
+            }
+
+            return energyEmpty;
+        }
+
+        static void RefillEnergy(IButtonPositionsAndColors posColorManager)
+        {
+            Mouse.LeftClick(posColorManager.RefreshEnergyButtonPos);
+            Thread.Sleep(Randomize(300, 1500));
+            Mouse.LeftClick(posColorManager.Energy4CrystalsButtonPos);
+            Thread.Sleep(Randomize(300, 1500));
+            Mouse.LeftClick(posColorManager.Energy4CrystalsConfirmButtonPos);
+            Thread.Sleep(Randomize(300, 4000));
+            Mouse.LeftClick(posColorManager.RefreshedEnergyConfirmButtonPos);
+            Thread.Sleep(Randomize(300, 1500));
+            Mouse.LeftClick(posColorManager.CloseCashShopWindowButtonPos);
+            Thread.Sleep(Randomize(300, 1500));
+
+            //new List<Point>
+            //{
+            //    posColorManager.RefreshEnergyButtonPos,
+            //    posColorManager.Energy4CrystalsButtonPos,
+            //    posColorManager.Energy4CrystalsConfirmButtonPos,
+            //    posColorManager.RefreshedEnergyConfirmButtonPos,
+            //    posColorManager.CloseCashShopWindowButtonPos,
+            //}.ForEach(p => { Mouse.LeftClick(p); Thread.Sleep(Randomize(300, 1500)); });
+        }
+
+        static int StartNewRound(IButtonPositionsAndColors posColorManager, bool refreshEnergy)
+        {
+            //Start a new round
+            Mouse.LeftClick(posColorManager.ReplayButtonPos);
+            Thread.Sleep(Randomize(300, 2300));
+            int refreshedEnergy = 0;
+
+            //Check whether energy is empty
+            if (CheckEnergyEmpty(refreshEnergy, posColorManager))
+            {
+                refreshedEnergy++;
+            }
+
+            Mouse.LeftClick(posColorManager.StartBattleButtonPos);
+            Thread.Sleep(Randomize(300, 1000));
+
+            return refreshedEnergy;
+        }
+
+        static void SlideMonsterList(Point p, int distance)
+        {
+            const int speedFactor = 2;
+            bool endReached = false;
+
+            while (!endReached)
+            {
+                Mouse.LeftDown(p);
+
+                for (int i = 0; i < 800 / speedFactor; i++)
                 {
-                    graphics.CopyFromScreen(position, new Point(0, 0), new Size(1, 1));
+                    Cursor.Position = new Point(Cursor.Position.X - speedFactor, Cursor.Position.Y);
+                    Thread.Sleep(1);
                 }
-                return bitmap.GetPixel(0, 0);
+
+                Thread.Sleep(100);
+
+                endReached = new List<Point>
+                {
+                    new Point(1190, 750),
+                    new Point(1222, 750),
+                    new Point(1210, 780),
+                }.TrueForAll(x => Screen.GetPixel(x).Matches(Color.FromArgb(40, 26, 13)));
+
+                Mouse.LeftUp(p);
+                Thread.Sleep(Randomize(100, 500));
             }
         }
 
-        static bool MatchedColor(Color expectedColor, Color isColor)
+        static void ListerKeyBoardEvent(Thread mainThread)
         {
-            return isColor.R >= expectedColor.R - 20 && isColor.R <= expectedColor.R + 20 
-                && isColor.G >= expectedColor.G - 20 && isColor.G <= expectedColor.G + 20 
-                && isColor.B >= expectedColor.B - 20 && isColor.B <= expectedColor.B + 20;
+            for (;;)
+            {
+                if (Console.ReadKey(true).Key == ConsoleKey.Escape)
+                {
+                    return;
+                }
+                Thread.Sleep(100);
+            }
         }
 
-        static int Randomize(int interval, int value)
+        //##########################################################################################################
+        //######################################         MODES         #############################################
+        //##########################################################################################################
+
+        static void FarmRunes(bool refreshEnergy, InputOutput inOutManager, IButtonPositionsAndColors posColorManager)
         {
-            Random rad = new Random();
-            return rad.Next(value - interval, value + interval);
+            //Statistic variables
+            int runs = 0;
+            int successfulRuns = 0;
+            int goodRuneCount = 0;
+            int badRuneCount = 0;
+            int lossCount = 0;
+            int miscDrops = 0;
+            int refills = 0;
+
+            DateTime startedData = DateTime.Now;
+            inOutManager.PrintStatistics(startedData, runs, successfulRuns, lossCount, goodRuneCount, badRuneCount, miscDrops, refills);
+
+            for (;;)
+            {
+                //Win condition - Check reward color and a pixel in the middle
+                if (posColorManager.WinCondition1Col.Matches(Screen.GetPixel(posColorManager.WinCondition1Pos)) &&
+                    posColorManager.WinCondition2Col.Matches(Screen.GetPixel(posColorManager.WinCondition2Pos)))
+                {
+                    //Perform a double click
+                    Mouse.DoubleLeftClick(posColorManager.DoubleClickPos);
+                    Thread.Sleep(Randomize(300, 2000));
+
+                    //Check whether it is a rune drop or not
+                    if (posColorManager.CheckRuneDropCol.Matches(Screen.GetPixel(posColorManager.CheckRuneDropPos)))
+                    {
+                        //Rune drop
+                        //Check whether it is a good rune (6* || legend)
+                        if (posColorManager.CheckSixStarRuneCol.Matches(Screen.GetPixel(posColorManager.CheckSixStarRunePos))
+                            || posColorManager.CheckLegendCol.Matches(Screen.GetPixel(posColorManager.CheckLegendPos)))
+                        {
+                            //Good rune
+                            goodRuneCount++;
+                            Screen.TakeScreenshot(ROOTPATH, goodRuneCount);
+                            Thread.Sleep(Randomize(300, 1200));
+                            Mouse.LeftClick(posColorManager.GetRuneButtonPos);
+                            Thread.Sleep(Randomize(300, 1200));
+                        }
+                        else
+                        {
+                            //Bad rune
+                            badRuneCount++;
+                            //Purple 5* rune: take screenshot in order to check the sell heuristic quality
+                            //if ((checkRuneName(230, 130, 237) && MatchedColor(221, 228, 226, GetPixel(new Point(657, 366)))))
+                            //    take_screenshot(SUBPATH, bad_rune_count);
+                            Mouse.LeftClick(posColorManager.SellRuneButtonPos);
+                            Thread.Sleep(Randomize(300, 1200));
+                            //Is it a 5* or violet rune? Confirm sell button
+                            Mouse.LeftClick(posColorManager.ConfirmSellRuneButtonPos);
+                            Thread.Sleep(Randomize(300, 3500));
+                        }
+                    }
+                    else
+                    {
+                        //Unknown scroll, rainbowmon, mystical scroll, ...
+                        //sendMouseLeftclick(new Point(Randomize(90, 890), Randomize(15, 860)));
+                        Mouse.LeftClick(posColorManager.GetMiscButtonPos);
+                        Thread.Sleep(Randomize(300, 1500));
+                        miscDrops++;
+                    }
+                    refills += StartNewRound(posColorManager, refreshEnergy);
+                    successfulRuns++;
+                    runs++;
+                    inOutManager.PrintStatistics(startedData, runs, successfulRuns, lossCount, goodRuneCount, badRuneCount, miscDrops, refills);
+                }
+                //Lose condition
+                else if (posColorManager.LoseCondition1Col.Matches(Screen.GetPixel(posColorManager.LoseCondition1Pos)) &&
+                         posColorManager.LoseCondition2Col.Matches(Screen.GetPixel(posColorManager.LoseCondition2Pos)))
+                {
+                    Mouse.LeftClick(posColorManager.NoContinueButtonPos);
+                    Thread.Sleep(Randomize(300, 3500));
+                    Mouse.LeftClick(posColorManager.ReplayButtonPos);
+                    Thread.Sleep(Randomize(300, 1500));
+
+                    refills += StartNewRound(posColorManager, refreshEnergy);
+
+                    lossCount++;
+                    runs++;
+                    inOutManager.PrintStatistics(startedData, runs, successfulRuns, lossCount, goodRuneCount, badRuneCount, miscDrops, refills);
+                }
+                //Network problems - send data again
+                else if (posColorManager.NetworkProblems1Col.Matches(Screen.GetPixel(posColorManager.NetworkProblems1Pos)) &&
+                         posColorManager.NetworkProblems2Col.Matches(Screen.GetPixel(posColorManager.NetworkProblems2Pos)))
+                {
+                    Mouse.LeftClick(posColorManager.SendDataAgainButtonPos);
+                }
+                //Unstable network connection
+                else if (posColorManager.UnstableConnection1Col.Matches(Screen.GetPixel(posColorManager.UnstableConnection1Pos)) &&
+                         posColorManager.UnstableConnection1Col.Matches(Screen.GetPixel(posColorManager.UnstableConnection2Pos)))
+                {
+                    Mouse.LeftClick(posColorManager.ResendWinButtonPos);
+                }
+                Thread.Sleep(1500);
+            }
         }
 
+        static bool MatchesColor((byte r, byte g, byte b) color, int x, int y)
+        {
+            return Color.FromArgb(color.r, color.g, color.b).Matches(Screen.GetPixel(new Point(x, y)));
+        }
+
+        #region Unused
         static bool CheckRuneName(Color color)
         {
             bool matched = false;
             for (int i = 0; i < 200; i = i + 2)
             {
-                if (MatchedColor(color, GetPixel(new Point(800 + i, 300))))
+                if (color.Matches(Screen.GetPixel(new Point(800 + i, 300))))
                 {
                     matched = true;
                     break;
@@ -142,476 +238,297 @@ namespace SW_Level_Bot
             return matched;
         }
 
-        static bool CheckEnergyEmpty(bool refresh_energy, ButtonPositionsAndColors PosColorManager)
+        static int ChangeMonster(bool[] farmerPos, bool[] monsterMaxed)
         {
-            if (refresh_energy && MatchedColor(PosColorManager.CheckEnergyEmpty1Col, GetPixel(PosColorManager.CheckEnergyEmpty1Pos)) && 
-                MatchedColor(PosColorManager.CheckEnergyEmpty2Col, GetPixel(PosColorManager.CheckEnergyEmpty2Pos)))
+            int changedMonster = 0;
+            Point[] monsterPositionsLineup = { new Point(Randomize(50, 450), Randomize(50, 300)), new Point(Randomize(50, 250), Randomize(50, 400)),
+                new Point(Randomize(50, 650), Randomize(50, 400)), new Point(Randomize(50, 450), Randomize(50, 500)) };
+            Point[] monsterPositionsSlide = { new Point(Randomize(25, 1100), Randomize(25, 745)), new Point(Randomize(25, 950), Randomize(25, 745)),
+                new Point(Randomize(25, 780), Randomize(25, 745)) };
+
+            System.Diagnostics.Debug.Assert(monsterPositionsLineup.Length == monsterPositionsSlide.Length);
+
+            //Remove maxed monsters from team 
+            for (int i = 0; i < monsterPositionsLineup.Length; i++)
             {
-                RefillEnergy(PosColorManager);
-                Thread.Sleep(Randomize(300, 2000));
-                sendMouseLeftclick(PosColorManager.ReplayButtonPos);
-                Thread.Sleep(Randomize(300, 2500));
-                return true;
-            }
-            return false;
-        }
-
-        static void TakeScreenshot(string path, int nr)
-        {
-            Bitmap b = new Bitmap(SystemInformation.VirtualScreen.Width, SystemInformation.VirtualScreen.Height);
-            Graphics g = Graphics.FromImage(b);
-            g.CopyFromScreen(0, 0, 0, 0, b.Size);
-            g.Dispose();
-            b.Save(path + nr + ".gif");
-        }
-
-        static void RefillEnergy(ButtonPositionsAndColors PosColorManager)
-        {
-            sendMouseLeftclick(PosColorManager.RefreshEnergyButtonPos);
-            Thread.Sleep(Randomize(300, 1500));
-            sendMouseLeftclick(PosColorManager.Energy4CrystalsButtonPos);
-            Thread.Sleep(Randomize(300, 1500));
-            sendMouseLeftclick(PosColorManager.Energy4CrystalsConfirmButtonPos);
-            Thread.Sleep(Randomize(300, 4000));
-            sendMouseLeftclick(PosColorManager.RefreshedEnergyConfirmButtonPos);
-            Thread.Sleep(Randomize(300, 1500));
-            sendMouseLeftclick(PosColorManager.CloseCashShopWindowButtonPos);
-            Thread.Sleep(Randomize(300, 1500));
-        }
-
-        static int StartNewRound(ButtonPositionsAndColors PosColorManager, bool refresh_energy)
-        {
-            int refreshedEnergy = 0;
-            //Start a new round
-            sendMouseLeftclick(PosColorManager.ReplayButtonPos);
-            Thread.Sleep(Randomize(300, 2300));
-
-            //Check whether energy is empty
-            if (CheckEnergyEmpty(refresh_energy, PosColorManager))
-                refreshedEnergy++;
-
-            sendMouseLeftclick(PosColorManager.StartBattleButtonPos);
-            Thread.Sleep(Randomize(300, 1000));
-
-            return refreshedEnergy;
-        }
-
-        //static void SlideMonsterList(Point p, int distance)
-        //{
-        //    bool end_reached = false;
-        //    int speed_factor = 2;
-
-        //    do
-        //    {
-        //        System.Windows.Forms.Cursor.Position = p;
-        //        mouse_event(MOUSEEVENTF_LEFTDOWN, (uint)p.X, (uint)p.Y, 0, (UIntPtr)0);
-
-        //        for (int i = 0; i < 800 / speed_factor; i++)
-        //        {
-        //            System.Windows.Forms.Cursor.Position = new Point(System.Windows.Forms.Cursor.Position.X - speed_factor, System.Windows.Forms.Cursor.Position.Y);
-        //            Thread.Sleep(1);
-        //        }
-
-        //        Thread.Sleep(100);
-        //        if (MatchedColor(40, 26, 13, GetPixel(new Point(1190, 750))) && MatchedColor(40, 26, 13, GetPixel(new Point(1222, 750))) && MatchedColor(40, 26, 13, GetPixel(new Point(1210, 780))))
-        //            end_reached = true;
-
-        //        mouse_event(MOUSEEVENTF_LEFTUP, (uint)p.X, (uint)p.Y, 0, (UIntPtr)0);
-        //        Thread.Sleep(Randomize(100, 500));
-        //    } while (!end_reached);
-            
-        //}
-
-        //static int ChangeMonster(bool[] farmer_pos, bool[] monster_maxed)
-        //{
-        //    int changed_monster = 0;
-        //    Point[] monster_positions_lineup = { new Point(Randomize(50, 450), Randomize(50, 300)), new Point(Randomize(50, 250), Randomize(50, 400)), new Point(Randomize(50, 650), Randomize(50, 400)), new Point(Randomize(50, 450), Randomize(50, 500))};
-        //    Point[] monster_positions_slide = { new Point(Randomize(25, 1100), Randomize(25, 745)), new Point(Randomize(25, 950), Randomize(25, 745)), new Point(Randomize(25, 780), Randomize(25, 745))};
-
-        //    //Remove maxed monsters from team 
-        //    for (int i = 0; i < 4; i++)
-        //    {
-        //        if (monster_maxed[i] && !farmer_pos[i])
-        //        {
-        //            sendMouseLeftclick(monster_positions_lineup[i]);
-        //            changed_monster++;
-        //            Thread.Sleep(500);
-        //        }
-        //    }
-
-        //    //Slide and select new monsters
-        //    SlideMonsterList(new Point(Randomize(5, 1100), Randomize(5, 750)), 400);
-        //    sendMouseLeftclick(new Point(Randomize(5, 900), Randomize(5, 500)));
-        //    Thread.Sleep(Randomize(150, 1000));
-        //    for (int i = 0; i < changed_monster; i++)
-        //    {
-        //        sendMouseLeftclick(monster_positions_slide[i]);
-        //        Thread.Sleep(Randomize(100, 500));
-        //    }
-
-        //    return changed_monster;
-        //} 
-
-        static void ListerKeyBoardEvent(Thread main_thread)
-        {
-            do
-            {
-                if (Console.ReadKey(true).Key == ConsoleKey.Escape)
+                if (monsterMaxed[i] && !farmerPos[i])
                 {
-                    return;
+                    Mouse.LeftClick(monsterPositionsLineup[i]);
+                    changedMonster++;
+                    Thread.Sleep(500);
                 }
-                Thread.Sleep(100);
-            } while (true);
+            }
+
+            //Slide and select new monsters
+            SlideMonsterList(new Point(Randomize(5, 1100), Randomize(5, 750)), 400);
+            Mouse.LeftClick(new Point(Randomize(5, 900), Randomize(5, 500)));
+            Thread.Sleep(Randomize(150, 1000));
+
+            for (int i = 0; i < changedMonster; i++)
+            {
+                Mouse.LeftClick(monsterPositionsSlide[i]);
+                Thread.Sleep(Randomize(100, 500));
+            }
+
+            return changedMonster;
         }
 
-
-        //##########################################################################################################
-        //######################################         MODES         #############################################
-        //##########################################################################################################
-
-        static void farm_runes(bool refresh_energy, InputOutput InOutManager, ButtonPositionsAndColors PosColorManager)
+        static void FarmFooder(bool refreshEnergy, bool[] farmerPos, int farmerLevelsPos, bool automaticMonsterReplace, InputOutput inOutManager, IButtonPositionsAndColors posColorManager)
         {
             //Statistic variables
             int runs = 0;
-            int successful_runs = 0;
-            int good_rune_count = 0;
-            int bad_rune_count = 0;
-            int loss_count = 0;
-            int misc_drops = 0;
+            int successfulRuns = 0;
+            int lossCount = 0;
             int refills = 0;
+            int maxedMonsters = 0;
 
-            DateTime started_date = DateTime.Now;
+            bool wonRun = false;
+            bool failedRun = false;
 
-            InOutManager.print_statistic(started_date, runs, successful_runs, loss_count, good_rune_count, bad_rune_count, misc_drops, refills);
+            bool[] monsterMaxed = new bool[4];
+            DateTime startedDate = DateTime.Now;
+
+            //Print statistic
+            inOutManager.PrintStatistics(startedDate, runs, successfulRuns, lossCount, refills: refills, maxedMonsters: maxedMonsters);
 
             for (;;)
             {
-                //Win condition - Check reward color and a pixel in the middle
-                if (MatchedColor(PosColorManager.WinCondition1Col, GetPixel(PosColorManager.WinCondition1Pos)) && 
-                    MatchedColor(PosColorManager.WinCondition2Col, GetPixel(PosColorManager.WinCondition2Pos)))
-                {
-                    //Perform a double click
-                    sendMouseDoubleClick(PosColorManager.DoubleClickPos);
-                    Thread.Sleep(Randomize(300, 2000));
+                wonRun = MatchesColor((241, 238, 207), 890, 390) && MatchesColor((44, 30, 9), 830, 540);
+                failedRun = MatchesColor((235, 40, 90), 502, 702) && MatchesColor((250, 250, 250), 925, 529);
 
-                    //Check whether it is a rune drop or not
-                    if (MatchedColor(PosColorManager.CheckRuneDropCol, GetPixel(PosColorManager.CheckRuneDropPos)))
+                //Win condition - Check reward color and a pixel in the middle
+                if (wonRun || failedRun)
+                {
+                    Thread.Sleep(Randomize(300, 1000));
+
+                    if (wonRun)
                     {
-                        //Rune drop
-                        //Check whether it is a good rune (6* || legend)
-                        if (MatchedColor(PosColorManager.CheckSixStarRuneCol, GetPixel(PosColorManager.CheckSixStarRunePos)) || MatchedColor(PosColorManager.CheckLegendCol, GetPixel(PosColorManager.CheckLegendPos)))
+                        //Check whether a monster is fully leveled                        
+                        monsterMaxed[0] = !MatchesColor((252, 241, 197), 670, 700);
+                        monsterMaxed[1] = !MatchesColor((252, 241, 197), 1060, 700);
+                        monsterMaxed[2] = !MatchesColor((252, 241, 197), 1450, 700);
+                        monsterMaxed[3] = !MatchesColor((233, 213, 178), 668, 825);
+
+                        //Move mouse to position and perform a double click
+                        Mouse.DoubleLeftClick(new Point(Randomize(150, 920), Randomize(100, 500)));
+                        Thread.Sleep(Randomize(300, 2000));
+
+                        //Check whether it's a rune drop or an unknown scroll and go to monster select screen
+                        //Rune drop detected
+                        if (MatchesColor((244, 229, 169), 766, 850))
                         {
-                            //Good rune
-                            good_rune_count++;
-                            TakeScreenshot(ROOTPATH, good_rune_count);
-                            Thread.Sleep(Randomize(300, 1200));
-                            sendMouseLeftclick(PosColorManager.GetRuneButtonPos);
-                            Thread.Sleep(Randomize(300, 1200));
+                            Mouse.LeftClick(new Point(Randomize(35, 766), Randomize(30, 850)));
+                            Thread.Sleep(Randomize(300, 2200));
                         }
+                        //Misc drop detected
                         else
                         {
-                            //Bad rune
-                            bad_rune_count++;
-                            //Purple 5* rune: take screenshot in order to check the sell heuristic quality
-                            //if ((checkRuneName(230, 130, 237) && MatchedColor(221, 228, 226, GetPixel(new Point(657, 366)))))
-                            //    take_screenshot(SUBPATH, bad_rune_count);
-                            sendMouseLeftclick(PosColorManager.SellRuneButtonPos);
-                            Thread.Sleep(Randomize(300, 1200));
-                            //Is it a 5* or violet rune? Confirm sell button
-                            sendMouseLeftclick(PosColorManager.ConfirmSellRuneButtonPos);
-                            Thread.Sleep(Randomize(300, 3500));
+                            Mouse.LeftClick(new Point(Randomize(90, 890), Randomize(15, 860)));
                         }
+
+                        Thread.Sleep(Randomize(250, 1550));
+                        Mouse.LeftClick(new Point(Randomize(200, 560), Randomize(50, 600)));
+                        Thread.Sleep(Randomize(300, 2000));
+
+                        successfulRuns++;
                     }
                     else
                     {
-                        //Unknown scroll, rainbowmon, mystical scroll, ...
-                        //sendMouseLeftclick(new Point(Randomize(90, 890), Randomize(15, 860)));
-                        sendMouseLeftclick(PosColorManager.GetMiscButtonPos);
+                        Mouse.LeftClick(new Point(Randomize(150, 1170), Randomize(50, 700)));
                         Thread.Sleep(Randomize(300, 1500));
-                        misc_drops++;
 
+                        //Check whether a monster is fully leveled
+                        monsterMaxed[0] = !MatchesColor((252, 241, 197), 670, 700);
+                        monsterMaxed[1] = !MatchesColor((252, 241, 197), 1060, 700);
+                        monsterMaxed[2] = !MatchesColor((252, 241, 197), 1450, 700);
+                        monsterMaxed[3] = !MatchesColor((233, 213, 178), 668, 825);
+
+                        Mouse.LeftClick(new Point(Randomize(200, 560), Randomize(50, 600)));
+                        Thread.Sleep(Randomize(300, 1000));
+                        Mouse.LeftClick(new Point(Randomize(200, 560), Randomize(50, 600)));
+                        Thread.Sleep(Randomize(300, 2000));
+
+                        lossCount++;
                     }
-                    refills += StartNewRound(PosColorManager, refresh_energy);
-                    successful_runs++;
-                    runs++;
-                    InOutManager.print_statistic(started_date, runs, successful_runs, loss_count, good_rune_count, bad_rune_count, misc_drops, refills);
-                }
-                //Lose condition
-                else if (MatchedColor(PosColorManager.LoseCondition1Col, GetPixel(PosColorManager.LoseCondition1Pos)) && 
-                         MatchedColor(PosColorManager.LoseCondition2Col, GetPixel(PosColorManager.LoseCondition2Pos)))
-                {
-                    sendMouseLeftclick(PosColorManager.NoContinueButtonPos);
-                    Thread.Sleep(Randomize(300, 3500));
-                    sendMouseLeftclick(PosColorManager.ReplayButtonPos);
-                    Thread.Sleep(Randomize(300, 1500));
 
-                    refills += StartNewRound(PosColorManager, refresh_energy);
+                    //Check whether a monster is maxed and change or signal it
+                    if ((monsterMaxed[0] && !farmerPos[0]) || (monsterMaxed[1] && !farmerPos[1]) || (monsterMaxed[2] && !farmerPos[2]) || (monsterMaxed[3] && !farmerPos[3]))
+                    {
+                        //Either manually monster change was chosen or the farmer reached max level
+                        if (!automaticMonsterReplace || (farmerLevelsPos > -1 && monsterMaxed[farmerLevelsPos]))
+                        {
+                            const int f = 3;
+                            Console.Beep(660, f * 1000);
 
-                    loss_count++;
+                            while (MatchesColor((253, 253, 253), 1545, 730))
+                            {
+                                Thread.Sleep(1000);
+                            }
+                        }
+                        //Change maxed monster automatically
+                        else if (automaticMonsterReplace)
+                        {
+                            //Check whether energy is empty
+                            if (CheckEnergyEmpty(refreshEnergy, posColorManager))
+                            {
+                                refills++;
+                            }
+
+                            //maxedMonsters += change_monster(farmerPos, monsterMaxed);
+                            Mouse.LeftClick(new Point(Randomize(150, 1500), Randomize(50, 750)));
+                            Thread.Sleep(Randomize(300, 1000));
+                        }
+                    }
+                    //No monstar maxed start new round
+                    else
+                    {
+                        //Check whether energy is empty
+                        if (CheckEnergyEmpty(refreshEnergy, posColorManager))
+                        {
+                            refills++;
+                        }
+
+                        Mouse.LeftClick(new Point(Randomize(150, 1500), Randomize(50, 750)));
+                        Thread.Sleep(Randomize(300, 1000));
+                    }
+
                     runs++;
-                    InOutManager.print_statistic(started_date, runs, successful_runs, loss_count, good_rune_count, bad_rune_count, misc_drops, refills);
+                    inOutManager.PrintStatistics(startedDate, runs, successfulRuns, lossCount, refills: refills, maxedMonsters: maxedMonsters);
                 }
                 //Network problems - send data again
-                else if (MatchedColor(PosColorManager.NetworkProblems1Col, GetPixel(PosColorManager.NetworkProblems1Pos)) && 
-                         MatchedColor(PosColorManager.NetworkProblems2Col, GetPixel(PosColorManager.NetworkProblems2Pos)))
+                else if (MatchesColor((245, 229, 172), 702, 720) && MatchesColor((244, 229, 170), 1061, 726))
                 {
-                    sendMouseLeftclick(PosColorManager.SendDataAgainButtonPos);
+                    Mouse.LeftClick(new Point(Randomize(100, 730), Randomize(50, 720)));
                 }
-                //Unstable network connection
-                else if (MatchedColor(PosColorManager.UnstableConnection1Col, GetPixel(PosColorManager.UnstableConnection1Pos)) && 
-                         MatchedColor(PosColorManager.UnstableConnection2Col, GetPixel(PosColorManager.UnstableConnection2Pos)))
+
+                Thread.Sleep(1000);
+            }
+        }
+
+        static void FarmToa(bool refreshEnergy, int fails, InputOutput inOutManager)
+        {
+            //Statistic variables
+            int runs = 0;
+            int successfulRuns = 0;
+            int lossCount = 0;
+            int refills = 0;
+
+            int consecutiveFails = 0;
+            DateTime startedDate = DateTime.Now;
+
+            inOutManager.PrintStatistics(startedDate, runs, successfulRuns, lossCount, refills: refills);
+
+            while (consecutiveFails != fails || fails == 0)
+            {
+                //Win condition - Check reward color and a pixel in the middle
+                if (MatchesColor((241, 238, 207), 890, 390) && MatchesColor((44, 30, 9), 830, 540))
                 {
-                    sendMouseLeftclick(PosColorManager.ResendWinButtonPos);
+                    //Perform a double click
+                    Mouse.DoubleLeftClick(new Point(Randomize(150, 920), Randomize(100, 500)));
+                    Thread.Sleep(Randomize(300, 2000));
+
+                    //Take reward
+                    Mouse.LeftClick(new Point(Randomize(90, 890), Randomize(15, 860)));
+                    Thread.Sleep(Randomize(300, 1200));
+
+                    //Start a new round
+                    Mouse.LeftClick(new Point(Randomize(200, 560), Randomize(50, 600)));
+                    Thread.Sleep(Randomize(300, 2000));
+
+                    //Check whether energy is empty
+                    //if (checkEnergyEmpty(refreshEnergy))
+                    //    refills++;
+
+                    Mouse.LeftClick(new Point(Randomize(150, 1500), Randomize(50, 750)));
+                    Thread.Sleep(Randomize(300, 1000));
+                    successfulRuns++;
+                    runs++;
+                    inOutManager.PrintStatistics(startedDate, runs, successfulRuns, lossCount, refills: refills);
+                    consecutiveFails = 0;
                 }
+                //Lose condition
+                else if (MatchesColor((237, 242, 50), 576, 162) && MatchesColor((143, 175, 50), 1162, 203))
+                {
+                    Mouse.LeftClick(new Point(Randomize(200, 560), Randomize(50, 600)));
+                    Thread.Sleep(Randomize(300, 2000));
+
+                    //Start a new round
+                    Mouse.LeftClick(new Point(Randomize(200, 560), Randomize(50, 600)));
+                    Thread.Sleep(Randomize(300, 2500));
+
+                    //Check whether energy is empty
+                    //if (checkEnergyEmpty(refreshEnergy))
+                    //    refills++;
+
+                    Mouse.LeftClick(new Point(Randomize(150, 1500), Randomize(50, 750)));
+                    Thread.Sleep(Randomize(300, 1000));
+                    lossCount++;
+                    runs++;
+                    inOutManager.PrintStatistics(startedDate, runs, successfulRuns, lossCount, refills: refills);
+                    consecutiveFails++;
+                }
+                //Network problems - send data again
+                else if (MatchesColor((245, 229, 172), 702, 720) && MatchesColor((244, 229, 170), 1061, 726))
+                {
+                    Mouse.LeftClick(new Point(Randomize(100, 730), Randomize(50, 720)));
+                }
+
                 Thread.Sleep(1500);
             }
         }
 
-        //static void farm_fooder(bool refresh_energy, bool[] farmer_pos, int farmer_levels_pos, bool automatic_monster_replace, InputOutput InOutManager)
-        //{
-        //     //Statistic variables
-        //    int runs = 0;
-        //    int successful_runs = 0;
-        //    int loss_count = 0;
-        //    int refills = 0;
-        //    int maxed_monsters = 0;
+        static void FarmBeasts(bool refreshEnergy, InputOutput inOutManager)
+        {
+            //Statistic variables
+            int runs = 0;
+            int refills = 0;
 
-        //    bool won_run = false;
-        //    bool failed_run = false;
+            DateTime startedDate = DateTime.Now;
 
-        //    bool[] monster_maxed = { false, false, false, false };
+            inOutManager.PrintStatistics(startedDate, runs, refills: refills);
 
-        //    DateTime started_date = DateTime.Now;
-            
-        //    //Print statistic
-        //    InOutManager.print_statistic(started_date, runs, successful_runs, loss_count, refills, maxed_monsters);
+            for (;;)
+            {
+                //Win condition
+                if (MatchesColor((255, 175, 0), 748, 194) && MatchesColor((251, 252, 44), 1060, 148))
+                {
+                    Thread.Sleep(Randomize(150, 4000));
+                    //Perform a click
+                    Mouse.LeftClick(new Point(Randomize(150, 920), Randomize(100, 500)));
+                    Thread.Sleep(Randomize(150, 1500));
 
-        //    for (;;)
-        //    {
-        //        won_run = MatchedColor(241, 238, 207, GetPixel(new Point(890, 390))) && MatchedColor(44, 30, 9, GetPixel(new Point(830, 540)));
-        //        failed_run = MatchedColor(235, 40, 90, GetPixel(new Point(502, 702))) && MatchedColor(250, 250, 250, GetPixel(new Point(925, 529)));
-        //        //Win condition - Check reward color and a pixel in the middle
-        //        if (won_run || failed_run)
-        //        {
-        //            Thread.Sleep(Randomize(300, 1000));
+                    //Start a new round
+                    Mouse.LeftClick(new Point(Randomize(200, 560), Randomize(50, 600)));
+                    Thread.Sleep(Randomize(300, 1500));
 
-        //            if (won_run)
-        //            {
-        //                //Check whether a monster is fully leveled
-        //                monster_maxed[0] = !MatchedColor(252, 241, 197, GetPixel(new Point(670, 700)));
-        //                monster_maxed[1] = !MatchedColor(252, 241, 197, GetPixel(new Point(1060, 700)));
-        //                monster_maxed[2] = !MatchedColor(252, 241, 197, GetPixel(new Point(1450, 700)));
-        //                monster_maxed[3] = !MatchedColor(233, 213, 178, GetPixel(new Point(668, 825)));
+                    //Check whether energy is empty
+                    //if (checkEnergyEmpty(refresh_energy))
+                    //    refills++;
 
-        //                //Move mouse to position and perform a double click
-        //                sendMouseDoubleClick(new Point(Randomize(150, 920), Randomize(100, 500)));
-        //                Thread.Sleep(Randomize(300, 2000));
+                    Mouse.LeftClick(new Point(Randomize(150, 1500), Randomize(50, 750)));
+                    Thread.Sleep(Randomize(300, 1000));
+                    runs++;
+                    inOutManager.PrintStatistics(startedDate, runs, refills: refills);
+                }
+                //Network problems - send data again
+                else if (MatchesColor((245, 229, 172), 702, 720) && MatchesColor((244, 229, 170), 1061, 726))
+                {
+                    Mouse.LeftClick(new Point(Randomize(100, 730), Randomize(50, 720)));
+                }
 
-        //                //Check whether it's a rune drop or an unknown scroll and go to monster select screen
-        //                //Rune drop detected
-        //                if (MatchedColor(244, 229, 169, GetPixel(new Point(766, 850))))
-        //                {
-        //                    sendMouseLeftclick(new Point(Randomize(35, 766), Randomize(30, 850)));
-        //                    Thread.Sleep(Randomize(300, 2200));
-        //                }
-        //                //Misc drop detected
-        //                else
-        //                    sendMouseLeftclick(new Point(Randomize(90, 890), Randomize(15, 860)));
-        //                Thread.Sleep(Randomize(250, 1550));
-        //                sendMouseLeftclick(new Point(Randomize(200, 560), Randomize(50, 600)));
-        //                Thread.Sleep(Randomize(300, 2000));
+                Thread.Sleep(1500);
+            }
+        }
+        #endregion
 
-        //                successful_runs++;
-        //            }
-        //            else
-        //            {
-        //                sendMouseLeftclick(new Point(Randomize(150, 1170), Randomize(50, 700)));
-        //                Thread.Sleep(Randomize(300, 1500));
-
-        //                //Check whether a monster is fully leveled
-        //                monster_maxed[0] = !MatchedColor(252, 241, 197, GetPixel(new Point(670, 700)));
-        //                monster_maxed[1] = !MatchedColor(252, 241, 197, GetPixel(new Point(1060, 700)));
-        //                monster_maxed[2] = !MatchedColor(252, 241, 197, GetPixel(new Point(1450, 700)));
-        //                monster_maxed[3] = !MatchedColor(233, 213, 178, GetPixel(new Point(668, 825)));
-
-        //                sendMouseLeftclick(new Point(Randomize(200, 560), Randomize(50, 600)));
-        //                Thread.Sleep(Randomize(300, 1000));
-        //                sendMouseLeftclick(new Point(Randomize(200, 560), Randomize(50, 600)));
-        //                Thread.Sleep(Randomize(300, 2000));
-
-        //                loss_count++;
-        //            }
-
-        //            //Check whether a monster is maxed and change or signal it
-        //            if ((monster_maxed[0] && !farmer_pos[0]) || (monster_maxed[1] && !farmer_pos[1]) || (monster_maxed[2] && !farmer_pos[2]) || (monster_maxed[3] && !farmer_pos[3]))
-        //            {
-        //                //Either manually monster change was chosen or the farmer reached max level
-        //                if (!automatic_monster_replace || (farmer_levels_pos > -1 && monster_maxed[farmer_levels_pos]))
-        //                {
-        //                    int f = 3;
-        //                    Console.Beep(660, f * 1000);
-        //                    while (MatchedColor(253, 253, 253, GetPixel(new Point(1545, 730))))
-        //                    {
-        //                        Thread.Sleep(1000);
-        //                    }
-        //                }
-        //                //Change maxed monster automatically
-        //                else if (automatic_monster_replace)
-        //                {
-        //                    //Check whether energy is empty
-        //                    if (checkEnergyEmpty(refresh_energy))
-        //                        refills++;
-
-        //                    maxed_monsters += change_monster(farmer_pos, monster_maxed);
-        //                    sendMouseLeftclick(new Point(Randomize(150, 1500), Randomize(50, 750)));
-        //                    Thread.Sleep(Randomize(300, 1000));
-        //                }
-
-        //            }
-        //            //No monstar maxed start new round
-        //            else
-        //            {
-        //                //Check whether energy is empty
-        //                if (checkEnergyEmpty(refresh_energy))
-        //                    refills++;
-
-        //                sendMouseLeftclick(new Point(Randomize(150, 1500), Randomize(50, 750)));
-        //                Thread.Sleep(Randomize(300, 1000));
-        //            }
-
-        //            runs++;
-        //            InOutManager.print_statistic(started_date, runs, successful_runs, loss_count, refills, maxed_monsters);
-        //        }
-        //        //Network problems - send data again
-        //        else if (MatchedColor(245, 229, 172, GetPixel(new Point(702, 720))) && MatchedColor(244, 229, 170, GetPixel(new Point(1061, 726))))
-        //        {
-        //            sendMouseLeftclick(new Point(Randomize(100, 730), Randomize(50, 720)));
-        //        }
-        //        Thread.Sleep(1000);
-        //    }
-        //}
-
-        //static void farm_toa(bool refresh_energy, int fails, InputOutput InOutManager)
-        //{
-        //    //Statistic variables
-        //    int runs = 0;
-        //    int successful_runs = 0;
-        //    int loss_count = 0;
-        //    int refills = 0;
-
-        //    int consecutive_fails = 0;
-        //    DateTime started_date = DateTime.Now;
-
-        //    InOutManager.print_statistic(started_date, runs, successful_runs, loss_count, refills);
-
-        //    for (; consecutive_fails != fails || fails == 0;)
-        //    {
-        //        //Win condition - Check reward color and a pixel in the middle
-        //        if (MatchedColor(241, 238, 207, GetPixel(new Point(890, 390))) && MatchedColor(44, 30, 9, GetPixel(new Point(830, 540))))
-        //        {
-        //            //Perform a double click
-        //            sendMouseDoubleClick(new Point(Randomize(150, 920), Randomize(100, 500)));
-        //            Thread.Sleep(Randomize(300, 2000));
-                    
-        //            //Take reward
-        //            sendMouseLeftclick(new Point(Randomize(90, 890), Randomize(15, 860)));
-        //            Thread.Sleep(Randomize(300, 1200));
-                    
-        //            //Start a new round
-        //            sendMouseLeftclick(new Point(Randomize(200, 560), Randomize(50, 600)));
-        //            Thread.Sleep(Randomize(300, 2000));
-
-        //            //Check whether energy is empty
-        //            if (checkEnergyEmpty(refresh_energy))
-        //                refills++;
-
-        //            sendMouseLeftclick(new Point(Randomize(150, 1500), Randomize(50, 750)));
-        //            Thread.Sleep(Randomize(300, 1000));
-        //            successful_runs++;
-        //            runs++;
-        //            InOutManager.print_statistic(started_date, runs, successful_runs, loss_count, refills);
-        //            consecutive_fails = 0;
-        //        }
-        //        //Lose condition
-        //        else if (MatchedColor(237, 242, 50, GetPixel(new Point(576, 162))) && MatchedColor(143, 175, 50, GetPixel(new Point(1162, 203))))
-        //        {
-        //            sendMouseLeftclick(new Point(Randomize(200, 560), Randomize(50, 600)));
-        //            Thread.Sleep(Randomize(300, 2000));
-
-        //            //Start a new round
-        //            sendMouseLeftclick(new Point(Randomize(200, 560), Randomize(50, 600)));
-        //            Thread.Sleep(Randomize(300, 2500));
-
-        //            //Check whether energy is empty
-        //            if (checkEnergyEmpty(refresh_energy))
-        //                refills++;
-
-        //            sendMouseLeftclick(new Point(Randomize(150, 1500), Randomize(50, 750)));
-        //            Thread.Sleep(Randomize(300, 1000));
-        //            loss_count++;
-        //            runs++;
-        //            InOutManager.print_statistic(started_date, runs, successful_runs, loss_count, refills);
-        //            consecutive_fails++;
-        //        }
-        //        //Network problems - send data again
-        //        else if (MatchedColor(245, 229, 172, GetPixel(new Point(702, 720))) && MatchedColor(244, 229, 170, GetPixel(new Point(1061, 726))))
-        //        {
-        //            sendMouseLeftclick(new Point(Randomize(100, 730), Randomize(50, 720)));
-        //        }
-        //        Thread.Sleep(1500);
-        //    }
-        //}
-
-        //static void farm_beasts(bool refresh_energy, InputOutput InOutManager)
-        //{
-        //    //Statistic variables
-        //    int runs = 0;
-        //    int refills = 0;
-
-        //    DateTime started_date = DateTime.Now;
-
-        //    InOutManager.print_statistic(started_date, runs, refills);
-
-        //    for (;;)
-        //    {
-        //        //Win condition
-        //        if (MatchedColor(255, 175, 0, GetPixel(new Point(748, 194))) && MatchedColor(251, 252, 44, GetPixel(new Point(1060, 148))))
-        //        {
-        //            Thread.Sleep(Randomize(150, 4000));
-        //            //Perform a click
-        //            sendMouseLeftclick(new Point(Randomize(150, 920), Randomize(100, 500)));
-        //            Thread.Sleep(Randomize(150, 1500));
-
-        //            //Start a new round
-        //            sendMouseLeftclick(new Point(Randomize(200, 560), Randomize(50, 600)));
-        //            Thread.Sleep(Randomize(300, 1500));
-
-        //            //Check whether energy is empty
-        //            if (checkEnergyEmpty(refresh_energy))
-        //                refills++;
-
-        //            sendMouseLeftclick(new Point(Randomize(150, 1500), Randomize(50, 750)));
-        //            Thread.Sleep(Randomize(300, 1000));
-        //            runs++;
-        //            InOutManager.print_statistic(started_date, runs, refills);
-        //        }
-        //        //Network problems - send data again
-        //        else if (MatchedColor(245, 229, 172, GetPixel(new Point(702, 720))) && MatchedColor(244, 229, 170, GetPixel(new Point(1061, 726))))
-        //        {
-        //            sendMouseLeftclick(new Point(Randomize(100, 730), Randomize(50, 720)));
-        //        }
-        //        Thread.Sleep(1500);
-        //    }
-        //}
-
-        static void debug()
+        static void Debug()
         {
             for (;;)
             {
-                Console.WriteLine("Position X is:" + System.Windows.Forms.Cursor.Position.X + " Position Y is:" + System.Windows.Forms.Cursor.Position.Y
-                                   + "\n R: " + GetPixel(new Point(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y)).R.ToString()
-                                   + "\n G: " + GetPixel(new Point(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y)).G.ToString()
-                                   + "\n B: " + GetPixel(new Point(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y)).B.ToString() + "\n");
+                Console.WriteLine($"Position X is: {Cursor.Position.X} Position Y is: {Cursor.Position.Y}"
+                                   + "\n R:" + Screen.GetPixel(new Point(Cursor.Position.X, Cursor.Position.Y)).R.ToString()
+                                   + "\n G: " + Screen.GetPixel(new Point(Cursor.Position.X, Cursor.Position.Y)).G.ToString()
+                                   + "\n B: " + Screen.GetPixel(new Point(Cursor.Position.X, Cursor.Position.Y)).B.ToString() + "\n");
                 Thread.Sleep(1500);
             }
         }
@@ -622,62 +539,53 @@ namespace SW_Level_Bot
 
         static void Main(string[] args)
         {
-            int mode;
-            bool refresh_energy;
+            bool refreshEnergy;
 
-            InputOutput InOutManager = new InputOutput();
-            ButtonPositionAndColorsWindowed PosColorManager = new ButtonPositionAndColorsWindowed();
+            var inOutManager = new InputOutput();
+            var posColorManager = new ButtonPositionAndColorsWindowed();
 
-            Thread functionThread;
-            Thread keyEventThread;
+            string windowName = "Mobizen Mirroring";
+            Window.Move(windowName, new Point(0, 0), 1027, 516);
 
-            var hWnd = FindWindow(null, "Mobizen Mirroring");
-            Form ParentForm = (Form)Control.FromHandle(hWnd);
-
-            MoveWindow(hWnd, 0, 0, 1027, 516, true);
-
-            RECT rct;
-
-            if (!GetWindowRect(hWnd, out rct))
+            if (!Window.GetRectangle(Window.GetHandle(windowName), out var rct))
             {
-                MessageBox.Show("ERROR");
+                MessageBox.Show($"{windowName} was not found", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             float width = rct.Right - rct.Left + 1;
             float height = rct.Bottom - rct.Top + 1;
 
-            do
+            for (;;)
             {
                 Console.Clear();
-                Console.WriteLine("The mobizen window resolution should be: 1211 x 607");
-                Console.WriteLine("The current window resolution denotes: " + width + " x " + height);
-                mode = InOutManager.selectMode();
+                Console.WriteLine($"{windowName} resolution should be: 1211 x 607");
+                Console.WriteLine($"The current window resolution denotes: {width}x{height}");
 
-                switch (mode)
+                switch (inOutManager.SelectMode())
                 {
-                    case 1:
-                        refresh_energy = InOutManager.refreshEnergyDecision();
-                        functionThread = new Thread(() => farm_runes(refresh_energy, InOutManager, PosColorManager));
-                        keyEventThread = new Thread(() => ListerKeyBoardEvent(Thread.CurrentThread));
+                    case Mode.GeneralFarming:
+                        refreshEnergy = inOutManager.RefreshEnergyDecision();
+                        var functionThread = new Thread(() => FarmRunes(refreshEnergy, inOutManager, posColorManager));
+                        var keyEventThread = new Thread(() => ListerKeyBoardEvent(Thread.CurrentThread));
                         functionThread.Start();
                         keyEventThread.Start();
                         keyEventThread.Join();
                         functionThread.Abort();
                         break;
-                    case 2:
-                        refresh_energy = InOutManager.refreshEnergyDecision();
-                        int fails = InOutManager.toaFailsDecision();
+                    case Mode.Toa:
+                        refreshEnergy = inOutManager.RefreshEnergyDecision();
+                        int fails = inOutManager.ToaFailsDecision();
                         //farm_toa(refresh_energy, fails, InOutManager);
                         break;
-                    case 3:
-                        refresh_energy = InOutManager.refreshEnergyDecision();
-                        bool[] farmer_pos = { false, false, false, false };
+                    case Mode.FooderFarming:
+                        refreshEnergy = inOutManager.RefreshEnergyDecision();
+                        bool[] farmerPos = { false, false, false, false };
 
                         //Decide where the farming monster is positioned in the line-up and whether it also levels
-                        int farmer_levels_pos = InOutManager.farmerPositionDecision(ref farmer_pos);
+                        int farmerLevelPos = inOutManager.FarmerPositionDecision(ref farmerPos);
                         //Decide whether monster should be exchanged automatically
-                        bool automatic_monster_replace = InOutManager.automaticMonsterChangeDecision();
+                        bool automaticMonsterReplace = inOutManager.AutomaticMonsterChangeDecision();
 
                         //functionThread = new Thread(() => farm_fooder(refresh_energy, farmer_pos, farmer_levels_pos, automatic_monster_replace, InOutManager));
                         keyEventThread = new Thread(() => ListerKeyBoardEvent(Thread.CurrentThread));
@@ -686,8 +594,8 @@ namespace SW_Level_Bot
                         keyEventThread.Join();
                         //functionThread.Abort();
                         break;
-                    case 4:
-                        refresh_energy = InOutManager.refreshEnergyDecision();
+                    case Mode.BeastRifts:
+                        refreshEnergy = inOutManager.RefreshEnergyDecision();
                         //functionThread = new Thread(() => farm_beasts(refresh_energy, InOutManager));
                         keyEventThread = new Thread(() => ListerKeyBoardEvent(Thread.CurrentThread));
                         //functionThread.Start();
@@ -695,13 +603,13 @@ namespace SW_Level_Bot
                         keyEventThread.Join();
                         //functionThread.Abort();
                         break;
-                    case 8:
-                        debug();
+                    case Mode.Debug:
+                        Debug();
                         break;
-                    case 9:
+                    case Mode.Exit:
                         return;
                 }
-            } while (true);
+            }
         }
     }
 }

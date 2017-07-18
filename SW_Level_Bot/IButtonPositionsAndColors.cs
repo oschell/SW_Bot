@@ -7,7 +7,7 @@ using System.Drawing;
 
 namespace SW_Level_Bot
 {
-    interface ButtonPositionsAndColors
+    interface IButtonPositionsAndColors
     {
         Point WinCondition1Pos { get; }
         Color WinCondition1Col { get; }
@@ -50,6 +50,5 @@ namespace SW_Level_Bot
         Point Energy4CrystalsConfirmButtonPos { get; }
         Point RefreshedEnergyConfirmButtonPos { get; }
         Point CloseCashShopWindowButtonPos { get; }
-
     }
 }

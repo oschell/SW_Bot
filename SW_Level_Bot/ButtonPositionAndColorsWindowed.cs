@@ -5,9 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using static SW_Level_Bot.Randomizer;
+
 namespace SW_Level_Bot
 {
-    class ButtonPositionAndColorsWindowed:ButtonPositionsAndColors
+    class ButtonPositionAndColorsWindowed : IButtonPositionsAndColors
     {
         public Point WinCondition1Pos { get; } = new Point(547, 108);
         public Color WinCondition1Col { get; } = Color.FromArgb(248, 251, 53);
@@ -35,10 +37,11 @@ namespace SW_Level_Bot
         public Color CheckEnergyEmpty1Col { get; } = Color.FromArgb(223, 194, 126);
         public Point CheckEnergyEmpty2Pos { get; } = new Point(839, 244);
         public Color CheckEnergyEmpty2Col { get; } = Color.FromArgb(178, 156, 109);
-        public Point DoubleClickPos {
+        public Point DoubleClickPos
+        {
             get
             {
-               return new Point(Randomize(200, 570), Randomize(100, 300));
+                return new Point(Randomize(200, 570), Randomize(100, 300));
             }
         }
 
@@ -139,12 +142,6 @@ namespace SW_Level_Bot
             {
                 return new Point(Randomize(40, 560), Randomize(15, 500));
             }
-        }
-
-        static int Randomize(int interval, int value)
-        {
-            Random rad = new Random();
-            return rad.Next(value - interval, value + interval);
         }
     }
 }
