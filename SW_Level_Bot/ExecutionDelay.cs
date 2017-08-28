@@ -15,7 +15,7 @@ namespace SW_Level_Bot
 
         public static void DelayFor(int milliseconds, int deviation)
         {
-            Thread.Sleep(Random.FromInterval(milliseconds, deviation));
+            Thread.Sleep(Random.FromInterval(deviation, milliseconds));
             //Task.Delay(Random.FromInterval(milliseconds, deviation)).Wait();
         }
     }
