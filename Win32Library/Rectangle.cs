@@ -3,7 +3,7 @@
 namespace Win32Library
 {
     [StructLayout(LayoutKind.Sequential)]
-    public struct Rectangle
+    internal struct Rectangle
     {
         public int Left;
         public int Top;

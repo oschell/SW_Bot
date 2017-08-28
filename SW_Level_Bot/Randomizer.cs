@@ -2,18 +2,19 @@
 
 namespace SW_Level_Bot
 {
-    static class Randomizer
+    internal static class Randomizer
     {
-        private static Random random;
+        private static readonly Random Random;
 
         static Randomizer()
         {
-            random = new Random();
+            Random = new Random();
         }
 
+        [Obsolete("Use 'FromInterval' extension method instead")]
         public static int Randomize(int interval, int value)
         {
-            return random.Next(value - interval, value + interval);
+            return Random.Next(value - interval, value + interval);
         }
     }
 }

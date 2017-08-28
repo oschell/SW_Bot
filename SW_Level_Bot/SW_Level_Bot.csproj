@@ -33,11 +33,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.ValueTuple, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.3.1\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
     </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
@@ -48,19 +51,55 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ButtonPositionAndColorsFullscreen.cs" />
-    <Compile Include="ButtonPositionAndColorsWindowed.cs" />
-    <Compile Include="ColorExtensions.cs" />
-    <Compile Include="IButtonPositionsAndColors.cs" />
-    <Compile Include="InputOutput.cs" />
-    <Compile Include="Mode.cs" />
+    <Compile Include="AbstractFactory.cs" />
+    <Compile Include="BotStates\States\DebugState.cs" />
+    <Compile Include="Config\ButtonPositionAndColorsTemplate.cs" />
+    <Compile Include="Config\ConfigConverter.cs" />
+    <Compile Include="Modes\BotMode.cs" />
+    <Compile Include="Config\ButtonPositionAndColorsFullscreen.cs" />
+    <Compile Include="Config\ButtonPositionAndColorsWindowed.cs" />
+    <Compile Include="ExtensionMethods\ColorExtensions.cs" />
+    <Compile Include="ConsoleInputEventManager.cs" />
+    <Compile Include="ExecutionDelay.cs" />
+    <Compile Include="Config\IButtonPositionsAndColors.cs" />
+    <Compile Include="IO\InputOutput.cs" />
+    <Compile Include="Modes\ModeFactory.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="ExtensionMethods\RandomExtensions.cs" />
+    <Compile Include="BotStates\StateFactory.cs" />
+    <Compile Include="BotStates\StateManager.cs" />
+    <Compile Include="BotStates\States\AfterWinState.cs" />
+    <Compile Include="BotStates\States\BadRunDropState.cs" />
+    <Compile Include="BotStates\States\GoodRunDropState.cs" />
+    <Compile Include="BotStates\States\InitialRuneFarmingState.cs" />
+    <Compile Include="BotStates\States\IState.cs" />
+    <Compile Include="BotStates\States\LastRuneFarmingState.cs" />
+    <Compile Include="BotStates\States\LoseState.cs" />
+    <Compile Include="Modes\Mode.cs" />
+    <Compile Include="Modes\ModeConfig.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Randomizer.cs" />
+    <Compile Include="BotStates\States\NetworkProblemsState.cs" />
+    <Compile Include="BotStates\States\NoRuneDropState.cs" />
+    <Compile Include="BotStates\States\RuneDropState.cs" />
+    <Compile Include="BotStates\States\UnstableNetworkState.cs" />
+    <Compile Include="BotStates\States\WinLoseState.cs" />
+    <Compile Include="BotStates\States\WinState.cs" />
+    <Compile Include="BotStates\StateKind.cs" />
+    <Compile Include="Statistics.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Win32Library\Win32Library.csproj">

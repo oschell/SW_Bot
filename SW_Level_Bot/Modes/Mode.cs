@@ -1,6 +1,6 @@
-﻿namespace SW_Level_Bot
+﻿namespace SW_Level_Bot.Modes
 {
-    enum Mode
+    internal enum Mode
     {
         None = 0,
         GeneralFarming = 1,
@@ -8,6 +8,6 @@
         FooderFarming = 3,
         BeastRifts = 4,
         Debug = 8,
-        Exit = 9, 
+        Exit = 9
     }
 }
