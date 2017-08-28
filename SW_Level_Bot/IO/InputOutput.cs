@@ -120,8 +120,7 @@ namespace SW_Level_Bot.IO
                 Console.WriteLine("Exit with 9 \n");
                 Console.WriteLine("Please insert the desired mode number:");
 
-                if (int.TryParse(Console.ReadKey().KeyChar.ToString(), out var mode) &&
-                    Enum.IsDefined(typeof(Mode), mode))
+                if (int.TryParse(Console.ReadLine(), out var mode) && Enum.IsDefined(typeof(Mode), mode))
                 {
                     return (Mode)mode;
                 }

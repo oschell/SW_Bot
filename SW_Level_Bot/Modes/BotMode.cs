@@ -24,6 +24,7 @@ namespace SW_Level_Bot.Modes
         public void Start(IButtonPositionsAndColors posColorManager, ModeConfig config)
         {
             _isRunning = true;
+            _statistics.Print();
 
             // Maybe add final state
             while (_currState != null && _isRunning)

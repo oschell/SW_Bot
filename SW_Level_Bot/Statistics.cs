@@ -7,6 +7,18 @@ namespace SW_Level_Bot
         private const int PadLeft = 16;
         private const int PadRight = 20;
 
+        public Statistics()
+        {
+            BadRuneCount = 0;
+            GoodRuneCount = 0;
+            LossCount = 0;
+            MaxedMonsters = 0;
+            MiscDrops = 0;
+            Refills = 0;
+            Runs = 0;
+            SuccessfulRuns = 0;
+        }
+
         public int? BadRuneCount { get; set; }
         public int? GoodRuneCount { get; set; }
         public int? LossCount { get; set; }

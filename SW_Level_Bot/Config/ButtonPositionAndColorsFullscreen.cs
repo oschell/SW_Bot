@@ -20,24 +20,24 @@ namespace SW_Level_Bot.Config
         public Point CheckSixStarRunePos { get; } = new Point(673, 367);
 
         public Point CloseCashShopWindowButtonPos { get; } =
-            new Point(Random.FromInterval(80, 900), Random.FromInterval(35, 930));
+            new Point(Random.FromInterval(900, 80), Random.FromInterval(930, 35));
 
         public Point ConfirmSellRuneButtonPos { get; } =
-            new Point(Random.FromInterval(100, 731), Random.FromInterval(35, 654));
+            new Point(Random.FromInterval(731, 100), Random.FromInterval(654, 35));
 
         public Point DoubleClickPos { get; } =
-            new Point(Random.FromInterval(150, 920), Random.FromInterval(100, 500));
+            new Point(Random.FromInterval(920, 150), Random.FromInterval(500, 100));
 
         public Point Energy4CrystalsButtonPos { get; } =
-            new Point(Random.FromInterval(120, 482), Random.FromInterval(80, 559));
+            new Point(Random.FromInterval(482, 120), Random.FromInterval(559, 80));
 
         public Point Energy4CrystalsConfirmButtonPos { get; } =
-            new Point(Random.FromInterval(100, 730), Random.FromInterval(20, 640));
+            new Point(Random.FromInterval(730, 100), Random.FromInterval(640, 20));
 
-        public Point GetMiscButtonPos { get; } = new Point(Random.FromInterval(90, 890), Random.FromInterval(2, 900));
+        public Point GetMiscButtonPos { get; } = new Point(Random.FromInterval(890, 90), Random.FromInterval(900, 2));
 
         public Point GetRuneButtonPos { get; } =
-            new Point(Random.FromInterval(100, 1060), Random.FromInterval(35, 875));
+            new Point(Random.FromInterval(1060, 100), Random.FromInterval(875, 35));
 
         public Color LoseCondition1Col { get; } = Color.FromArgb(235, 40, 90);
         public Point LoseCondition1Pos { get; } = new Point(502, 702);
@@ -49,28 +49,28 @@ namespace SW_Level_Bot.Config
         public Point NetworkProblems2Pos { get; } = new Point(1061, 726);
 
         public Point NoContinueButtonPos { get; } =
-            new Point(Random.FromInterval(150, 1170), Random.FromInterval(50, 700));
+            new Point(Random.FromInterval(1170, 150), Random.FromInterval(700, 50));
 
         public Point RefreshedEnergyConfirmButtonPos { get; } =
-            new Point(Random.FromInterval(80, 900), Random.FromInterval(35, 657));
+            new Point(Random.FromInterval(900, 80), Random.FromInterval(657, 35));
 
         public Point RefreshEnergyButtonPos { get; } =
-            new Point(Random.FromInterval(80, 730), Random.FromInterval(35, 657));
+            new Point(Random.FromInterval(730, 80), Random.FromInterval(657, 35));
 
         public Point ReplayButtonPos { get; } =
-            new Point(Random.FromInterval(200, 560), Random.FromInterval(50, 600));
+            new Point(Random.FromInterval(560, 200), Random.FromInterval(600, 50));
 
         public Point ResendWinButtonPos { get; } =
-            new Point(Random.FromInterval(100, 730), Random.FromInterval(40, 650));
+            new Point(Random.FromInterval(730, 100), Random.FromInterval(650, 40));
 
         public Point SellRuneButtonPos { get; } =
-            new Point(Random.FromInterval(35, 766), Random.FromInterval(30, 850));
+            new Point(Random.FromInterval(766, 35), Random.FromInterval(850, 30));
 
         public Point SendDataAgainButtonPos { get; } =
-            new Point(Random.FromInterval(100, 730), Random.FromInterval(50, 720));
+            new Point(Random.FromInterval(730, 100), Random.FromInterval(720, 50));
 
         public Point StartBattleButtonPos { get; } =
-            new Point(Random.FromInterval(150, 1500), Random.FromInterval(50, 750));
+            new Point(Random.FromInterval(1500, 150), Random.FromInterval(750, 50));
 
         public Color UnstableConnection1Col { get; } = Color.FromArgb(195, 144, 54);
         public Point UnstableConnection1Pos { get; } = new Point(621, 669);

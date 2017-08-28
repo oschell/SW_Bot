@@ -27,20 +27,16 @@ namespace SW_Level_Bot.BotStates.States
 
         protected void RefillEnergy(IButtonPositionsAndColors posColorManager)
         {
-            var positions = new[]
-            {
-                posColorManager.RefreshEnergyButtonPos,
-                posColorManager.Energy4CrystalsButtonPos,
-                posColorManager.Energy4CrystalsConfirmButtonPos,
-                posColorManager.RefreshedEnergyConfirmButtonPos,
-                posColorManager.CloseCashShopWindowButtonPos
-            };
-            
-            foreach (var position in positions)
-            {
-                Mouse.LeftClick(position);
-                ExecutionDelay.DelayFor(1500, 300);
-            }
+            Mouse.LeftClick(posColorManager.RefreshEnergyButtonPos);
+            ExecutionDelay.DelayFor(1500, 300);
+            Mouse.LeftClick(posColorManager.Energy4CrystalsButtonPos);
+            ExecutionDelay.DelayFor(1500, 300);
+            Mouse.LeftClick(posColorManager.Energy4CrystalsConfirmButtonPos);
+            ExecutionDelay.DelayFor(4000, 300);
+            Mouse.LeftClick(posColorManager.RefreshedEnergyConfirmButtonPos);
+            ExecutionDelay.DelayFor(1500, 300);
+            Mouse.LeftClick(posColorManager.CloseCashShopWindowButtonPos);
+            ExecutionDelay.DelayFor(1500, 300);
         }
 
         protected int StartNewRound(IButtonPositionsAndColors posColorManager, bool refreshEnergy)

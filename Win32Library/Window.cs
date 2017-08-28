@@ -26,7 +26,7 @@ namespace Win32Library
         public static bool GetWindowInfo(IntPtr handle, out WindowInfo windowInfo)
         {
             var windowFound = GetWindowRect(handle, out var rectangle);
-            windowInfo = new WindowInfo(rectangle.Left, rectangle.Right, rectangle.Top, rectangle.Right);
+            windowInfo = new WindowInfo(rectangle.Left, rectangle.Right, rectangle.Top, rectangle.Bottom);
             return windowFound;
         }
 

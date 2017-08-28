@@ -11,14 +11,14 @@ namespace Win32Library
         public static void DoubleLeftClick(Point position)
         {
             LeftClick(position);
-            Thread.Sleep(new Random().Next(250, 750));
+            Thread.Sleep(new Random().Next(500, 1000));
             LeftClick(position);
         }
 
         public static void DoubleRightClick(Point position)
         {
             RightClick(position);
-            Thread.Sleep(new Random().Next(250, 750));
+            Thread.Sleep(new Random().Next(500, 1000));
             RightClick(position);
         }
 
